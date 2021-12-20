@@ -6,7 +6,6 @@
 #include <fstream>
 #include <map>
 #include <string> 
-#include <regex> 
 #include <iterator>
 using namespace std;
 
