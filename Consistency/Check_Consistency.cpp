@@ -2,31 +2,10 @@
 
 using namespace std;
 
-vector<my_structure> initial_filteration(vector<my_structure> structs)
-{
-    vector<my_structure> unique_struct;
-    bool matched;
-    for (int i = 0; i < structs.size(); i++)
-    {
-        matched = 0;
-        for (int j = 0; j < structs.size(); j++)
-        {
-            if ((structs[i].get_str() == (structs[j].get_str()[0] + structs[j].get_str().substr(2)) || structs[j].get_str() == (structs[i].get_str()[0] + structs[i].get_str().substr(2))) && i != j)
-                matched = 1;
-        }
-        if (!matched)
-        {
-            my_structure st(structs[i].get_str(), structs[i].get_index());
-            unique_struct.push_back(st);
-        }
-    }
-    return unique_struct;
-}
-
 vector<my_structure> Check_Consistency(vector<string> &strings, string &str)
 {
 
-    bool debug = 0, endofword, error, matched, child_node;
+    bool debug = 0, endofword, error, matched, child_node, consistent = 0;
     vector<my_structure> structs, unique_struct;
     stack<string> stk, temp_stk;
     stack<int> stk_index, temp_stk_index;
@@ -83,10 +62,12 @@ vector<my_structure> Check_Consistency(vector<string> &strings, string &str)
     }
 
     // print file consistency
+
+    if (stk.empty()) consistent = 1;
     if (debug)
     {
         cout << "____________________is consistent____________________" << endl;
-        cout << ((stk.empty()) ? "File is consistent" : "File is not consistent") << endl;
+        cout << ( consistent? "File is consistent" : "File is not consistent") << endl;
     }
 
     // fill the elements in the 2 stack(elements, indices) in the stucture
@@ -151,18 +132,19 @@ vector<my_structure> Check_Consistency(vector<string> &strings, string &str)
         ) child_node = 1;
 
         if (error && trim_first(strings[i]).front() != '<')
-            xml_wt_error.push_back(trim_first(strings[i]) + " --------------> ERROR 1: No opening tag");
+            xml_wt_error.push_back((strings[i]) + " --------------> ERROR 1: No opening tag");
         else if (error && trim_first(strings[i]).back() == '>')
-            xml_wt_error.push_back(trim_first(strings[i]) + " --------------> ERROR 4: Not matched");
+            xml_wt_error.push_back((strings[i]) + " --------------> ERROR 4: Not matched");
         else if (error)
-            xml_wt_error.push_back(trim_first(strings[i]) + " --------------> ERROR 2: No closeing tag");
+            xml_wt_error.push_back((strings[i]) + " --------------> ERROR 2: No closeing tag");
         else if (!child_node && (trim_first(strings[i]).front() != '<') && (trim_first(strings[i]).back() != '>') || (strings[0].front() != '<' && !i))
-            xml_wt_error.push_back(trim_first(strings[i]) + " --------------> ERROR 3: No Tag");
+            xml_wt_error.push_back((strings[i]) + " --------------> ERROR 3: No Tag");
         else
-            xml_wt_error.push_back(trim_first(strings[i]));
+            xml_wt_error.push_back((strings[i]));
     }
+  
+    if(consistent) str = "File doesn't contain erros";
+    else str = vector_to_string(xml_wt_error);
 
-    str = vector_to_string(xml_wt_error);
-
-    return structs;
+    return unique_struct;
 }
