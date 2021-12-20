@@ -1,39 +1,10 @@
 #include "functions.h"
 
-void fix_xml(vector<string> &strings, vector<my_structure> &structs, string &str)
+void fix_xml(vector<string> &strings, vector<my_structure> &unique_struct, string &str)
 {
 
-    bool error, error2, error3, matched, debug = 0;
+    bool error, error2, debug = 0;
     vector<string> post_fix;
-    vector<my_structure> unique_struct;
-
-    //loop to return the pair of elements that have an error or the unmatched elements from array
-    for (int i = 0; i < structs.size(); i++)
-    {
-        matched = 0;
-        for (int j = 0; j < structs.size(); j++)
-        {
-            if ((structs[i].get_str() == (structs[j].get_str()[0] + structs[j].get_str().substr(2)) || structs[j].get_str() == (structs[i].get_str()[0] + structs[i].get_str().substr(2))) && i != j)
-                matched = 1;
-        }
-        if (!matched)
-        {
-            my_structure st(structs[i].get_str(), structs[i].get_index());
-            unique_struct.push_back(st);
-        }
-    }
-
-    // function to remove the correct element out of the pair that contains an actual error from the vector
-    unpair_errors(unique_struct);
-
-    if (debug)
-    {
-        cout << "________________after unpair_errors_______________" << endl;
-        for (int i = 0; i < unique_struct.size(); i++)
-        {
-            cout << unique_struct[i].get_index() << "-> " << unique_struct[i].get_str() << endl;
-        }
-    }
 
     //function to fix the syntax error by adding '<' at the begining or '>' at the end
     //or mark the unmatched elements by making them an empty string " "
