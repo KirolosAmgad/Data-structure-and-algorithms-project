@@ -1,0 +1,24 @@
+#include "functions.h"
+
+using namespace std;
+
+vector<my_structure> initial_filteration(vector<my_structure> structs)
+{
+    vector<my_structure> unique_struct;
+    bool matched;
+    for (int i = 0; i < structs.size(); i++)
+    {
+        matched = 0;
+        for (int j = 0; j < structs.size(); j++)
+        {
+            if ((structs[i].get_str() == (structs[j].get_str()[0] + structs[j].get_str().substr(2)) || structs[j].get_str() == (structs[i].get_str()[0] + structs[i].get_str().substr(2))) && i != j)
+                matched = 1;
+        }
+        if (!matched)
+        {
+            my_structure st(structs[i].get_str(), structs[i].get_index());
+            unique_struct.push_back(st);
+        }
+    }
+    return unique_struct;
+}
