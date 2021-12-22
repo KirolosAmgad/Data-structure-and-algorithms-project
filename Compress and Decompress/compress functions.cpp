@@ -126,7 +126,7 @@ class c_node {
 
 
 	}
-
+////////// O(log n)  n num of nodes in huffman tree
 
 	void Fcompress::free_resources(c_node* p) {
 		if (p)
@@ -299,7 +299,7 @@ class c_node {
 		r_file.close();
 		w_file.close();
 	}
-     ////////O(n)
+     ////////O(n^2)
 	void Fcompress::create_tree_from_header() {
 		r_file.open(r_filename, std::ios::in | std::ios::binary);
 		unsigned char len;
@@ -355,7 +355,8 @@ class c_node {
 		std::string code;
                 ////////////// O(n^2)
 		for (unsigned int i = 0; i < wholetext.size() - 1; i++)
-		{
+		{ 
+                        //O(n)
 			code = Dec_t_Bin(wholetext[i]);
 			if (i == wholetext.size() - 2)
 				code = code.substr(zeros);
@@ -381,7 +382,7 @@ class c_node {
 
 
 
-
+///////////// O(n.m)
 	void Fcompress::compress() {
 
 		count_frq();
@@ -389,7 +390,7 @@ class c_node {
 		fill_table();
 		write_to_file();
 	}
-
+///////////// O(n.m) 
 	void Fcompress::decompress() {
 		create_tree_from_header();
 		read_from_file();
