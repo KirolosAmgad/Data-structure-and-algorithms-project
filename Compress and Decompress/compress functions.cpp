@@ -84,7 +84,7 @@ class c_node {
 
 	}
 
-
+///////////O(1)
 	Fcompress::Fcompress(std::string rfilename) {
 		for (int i = 0; i < 128; i++)
 		{
@@ -141,7 +141,7 @@ class c_node {
 			delete p;
 		}
 	}
-
+/////////////O(n)
 	void Fcompress::count_frq() {
 		r_file.open(r_filename, std::ios::in);
 
@@ -154,6 +154,7 @@ class c_node {
 		r_file.close();
 
 	}
+///////////O(n)
 	void Fcompress::create_tree(std::string code, char chara) {
 		c_node* parent = this->root;
 		for (unsigned int i = 0; i < code.size(); i++)
@@ -173,6 +174,7 @@ class c_node {
 		}
 		parent->char_ = chara;
 	}
+////////////O(n)
 	void Fcompress::create_tree() {
 		//creat min heap
 		for (int i = 0; i < 128; i++)
@@ -192,6 +194,7 @@ class c_node {
 			temp.push(root);
 		}
 	}
+/////////////
 	void Fcompress::calculate_leaves(c_node* p, std::string code) {
 		if (p->left == NULL && p->right == NULL)
 		{
@@ -207,6 +210,7 @@ class c_node {
 	void Fcompress::fill_table() {
 		calculate_leaves(root, "");
 	}
+/////////O(n)
 	int Fcompress::Bin_t_Dec(std::string b)
 	{
 		int n = b.length();
@@ -220,7 +224,7 @@ class c_node {
 		}
 		return sum;
 	}
-
+/////////O(n)
 	std::string Fcompress::Dec_t_Bin(int d)
 	{
 		std::string temp = "", B = "";
@@ -232,7 +236,7 @@ class c_node {
 		B.append(temp);
 		return B;
 	}
-
+/////////O(n^2)
 	void Fcompress::write_to_file() {
 		std::string to_write = "";
 		std::string code = "";
@@ -295,7 +299,7 @@ class c_node {
 		r_file.close();
 		w_file.close();
 	}
-       //O(
+     ////////O(n)
 	void Fcompress::create_tree_from_header() {
 		r_file.open(r_filename, std::ios::in | std::ios::binary);
 		unsigned char len;
