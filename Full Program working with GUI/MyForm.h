@@ -573,7 +573,7 @@ namespace XMLEditor {
 		index++;
 	}
 
-	void XML_indent(vector<string>& OutputSpaces, vector<string>& XML_Fixed, unsigned int SizeOfXML)
+	void XML_indent(vector<string>& OutputSpaces, vector<string>& XML_Fixed, unsigned int SizeOfXML)  //big-O -> O(n*m) where n is the number of lines in the xml and m is number of spaces added in each indentation addition
 	{
 		char start;
 		char end;
