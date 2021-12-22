@@ -1,20 +1,20 @@
 
-static inline void ltrim(string& s) {
+static inline void ltrim(string& s) {             //////////////////O(n)///////////////////
 		s.erase(s.begin(), find_if(s.begin(), s.end(), [](unsigned char ch) {
 			return !isspace(ch);
 			}));
 	}
-	static inline void rtrim(string& s) {
+	static inline void rtrim(string& s) {          //////////////////O(n)///////////////////
 		s.erase(find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
 			return !isspace(ch);
 			}).base(), s.end());
 	}
 
-	static inline void trim(string& s) {
+	static inline void trim(string& s) {         //////////////////O(n)///////////////////
 		ltrim(s);
 		rtrim(s);
 	}
-	int getDuplicate(vector<string> &v, string &key) {
+	int getDuplicate(vector<string> &v, string &key) {              //////////////////O(n)///////////////////
 
 		map<string, int> dup;
 
@@ -52,7 +52,7 @@ static inline void ltrim(string& s) {
 		GeneralTree();
 		void newNode(Node*& node, bool rootCheck);
 
-		string beautify() {
+		/* string beautify() {
 			iBeautify = 0;
 			return_string = "";
 			string returnString2;
@@ -173,13 +173,13 @@ static inline void ltrim(string& s) {
 			}
 			return return_string;
 
-		}
+		}   */
 
 
 
 
 		/////////////////////////////////////conversion///////////////////////////////////////////////////////
-		string convert_to_json() {
+		string convert_to_json() {            //////////////////O(n)///////////////////
 			json.str("");
 			iBeautify = 0;
 			json << "{";
@@ -344,7 +344,7 @@ static inline void ltrim(string& s) {
 
 	}
 
-	GeneralTree createTree(string xmlCode) {
+	GeneralTree createTree(string xmlCode) {       //////////////////O(n)///////////////////
 
 		GeneralTree tree;
 		vector<string> seglist1;
@@ -459,7 +459,7 @@ static inline void ltrim(string& s) {
 		return tree;
 	}
 
-	string xml_to_json(string xmlCode) {
+	string xml_to_json(string xmlCode) {       //////////////////O(n)///////////////////
 		GeneralTree tree;
 
 		rtrim(xmlCode);
