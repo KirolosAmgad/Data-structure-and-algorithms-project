@@ -295,7 +295,7 @@ class c_node {
 		r_file.close();
 		w_file.close();
 	}
-
+       //O(
 	void Fcompress::create_tree_from_header() {
 		r_file.open(r_filename, std::ios::in | std::ios::binary);
 		unsigned char len;
@@ -322,7 +322,7 @@ class c_node {
 		}
 		r_file.close();
 	}
-
+ ////////////// O(n^2)
 	void Fcompress::read_from_file() {
 
 		r_file.open(r_filename, std::ios::in | std::ios::binary);
@@ -349,6 +349,7 @@ class c_node {
 		}
 		c_node* parent = root;
 		std::string code;
+                ////////////// O(n^2)
 		for (unsigned int i = 0; i < wholetext.size() - 1; i++)
 		{
 			code = Dec_t_Bin(wholetext[i]);
