@@ -1,4 +1,8 @@
-	string XML_Minify(const vector<string>& XML_fixed)
+	
+/////////////////// O(n.m) 
+////////	n numb of lines 
+///////        m numb of char in each line 
+string XML_Minify(const vector<string>& XML_fixed)
 	{
 
 		string output = "";
