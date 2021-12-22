@@ -1,6 +1,7 @@
 
 #include "functions.h"
-
+////////////O(n.m) n num of lines
+/////////////  m num of charcters in each line
 void fix_syn_error(vector<my_structure> &structs)
 {
     int no_spaces = 0;
