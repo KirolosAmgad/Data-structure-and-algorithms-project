@@ -59,7 +59,7 @@ string print_users_and_followers_version_2(vector<follow_stuct> follow_stucts, s
     for(auto f:follow_stucts){
         str += names[f.get_my_id()] + " (id:";
         str += to_string(f.get_my_id());
-        str += ") is following {";
+        str += ") ----------> {";
         
         // for a better printing format
         for(int i=0; i<f.get_followers_id().size(); i++){
