@@ -226,7 +226,6 @@ namespace XMLEditor {
 		lines = unique_lines;
 	}
 
-
 	vector<my_structure> Check_Consistency(vector<string>& strings, string& str)
 	{
 
@@ -391,19 +390,19 @@ namespace XMLEditor {
 			else if (error && trim_first(strings[i]).back() == '>')
 				xml_wt_error.push_back((strings[i]) + " --------------> ERROR 4: Not matched");
 			else if (error)
-				xml_wt_error.push_back((strings[i]) + " --------------> ERROR 2: No closeing tag");
+				xml_wt_error.push_back((strings[i]) + " --------------> ERROR 2: No closing tag");
 			else if (!child_node && (trim_first(strings[i]).front() != '<') && (trim_first(strings[i]).back() != '>') || (strings[0].front() != '<' && !i))
 				xml_wt_error.push_back((strings[i]) + " --------------> ERROR 3: No Tag");
 			else
 				xml_wt_error.push_back((strings[i]));
 		}
 
-		if (consistent) str = "File doesn't contain erros";
+		if (consistent) str = "File doesn't contain errors (Consistent)";
 		else str = vector_to_string(xml_wt_error);
 
 		return unique_struct;
 	}
-	
+
 	void fix_syn_error(vector<my_structure>& structs)
 	{
 		int no_spaces = 0;
@@ -449,7 +448,6 @@ namespace XMLEditor {
 			else if (cur_str.front() == '<' && cur_str.back() != '>') structs[i].set_str(cur_str + '>');
 		}
 	}
-
 
 	void fix_xml(vector<string>& strings, vector<my_structure>& unique_struct, string& str)
 	{
@@ -573,7 +571,7 @@ namespace XMLEditor {
 		index++;
 	}
 
-	void XML_indent(vector<string>& OutputSpaces, vector<string>& XML_Fixed, unsigned int SizeOfXML)  //big-O -> O(n*m) where n is the number of lines in the xml and m is number of spaces added in each indentation addition
+	void XML_indent(vector<string>& OutputSpaces, vector<string>& XML_Fixed, unsigned int SizeOfXML)
 	{
 		char start;
 		char end;
@@ -1211,7 +1209,7 @@ namespace XMLEditor {
 		return out;
 	}
 
-	//////////////////////////////////////// compress and decompress /////////////////////////////////////////////
+	//////////////////////////////////////// compress /////////////////////////////////////////////
 
 
 	class c_node {
@@ -1291,7 +1289,6 @@ namespace XMLEditor {
 		this->left = NULL;
 		this->right = NULL;
 	}
-
 	c_node::c_node() {
 		this->left = NULL;
 		this->right = NULL;
@@ -1299,7 +1296,6 @@ namespace XMLEditor {
 	c_node::~c_node() {
 
 	}
-
 
 
 	Fcompress::Fcompress(std::string rfilename) {
@@ -1591,9 +1587,6 @@ namespace XMLEditor {
 	}
 
 
-
-
-
 	void Fcompress::compress() {
 
 		count_frq();
@@ -1608,6 +1601,80 @@ namespace XMLEditor {
 	}
 
 
+	vector<string> SearchFor(string& xml, string tag)
+	{
+		vector<string> collection;
+		long pos = 0, start;
+
+		while (true)
+		{
+			start = xml.find("<" + tag, pos);
+			if (start == string::npos)
+				return collection;
+			start = xml.find(">", start);
+			start++;
+
+			pos = xml.find("</" + tag, start);
+			if (pos == string::npos)
+				return collection;
+			collection.push_back(xml.substr(start, static_cast<std::basic_string<char, std::char_traits<char>, std::allocator<char>>::size_type>(pos) - start));
+		}
+	}
+
+	string* id_to_names(string xml) {
+
+		vector<string> users_vec = SearchFor(xml, "user");
+		//string* names = new string[users_vec.size() + 1];
+		string* names = new string[100000];
+
+
+		for (auto f : users_vec) {
+			vector<string> names_vec = SearchFor(f, "name");
+			string curr_name = SearchFor(f, "name")[0];
+			int curr_id = stoi(SearchFor(f, "id")[0]);
+			//cout << curr_id << " -> " << curr_name << endl; 
+			names[curr_id] = curr_name;
+		}
+
+		return names;
+	}
+
+
+
+	struct follow_stuct {
+	private:
+		int my_id;
+		vector<int> followers_id;
+
+	public:
+		follow_stuct(int my_id, vector<int> followers_id) {
+			this->my_id = my_id;
+			this->followers_id = followers_id;
+		}
+		void set_my_id(int my_id) { this->my_id = my_id; }
+		void set_followers_id(vector<int> followers_id) { this->followers_id = followers_id; }
+		int get_my_id() { return this->my_id; }
+		vector<int> get_followers_id() { return this->followers_id; }
+	};
+
+	vector<follow_stuct> get_users_and_followers(string xml) {
+
+		vector<string> users_vec = SearchFor(xml, "user");
+		vector<follow_stuct> follow_stucts;
+
+		for (int i = 0; i < users_vec.size(); i++) {
+
+			vector<string> curr_user_id = SearchFor(users_vec[i], "id");
+			int curr_id = stoi(curr_user_id[0]);
+			vector<int> curr_followers = {};
+
+			for (int j = 1; j < curr_user_id.size(); j++) curr_followers.push_back(stoi(curr_user_id[j]));
+
+			follow_stucts.push_back(follow_stuct(curr_id, curr_followers));
+		}
+
+		return follow_stucts;
+	}
 
 
 
@@ -1658,6 +1725,7 @@ namespace XMLEditor {
 	private: System::Windows::Forms::Button^ compress;
 	private: System::Windows::Forms::Button^ decode;
 	private: System::Windows::Forms::Button^ Decompress;
+	private: System::Windows::Forms::Button^ DataRepresentation;
 
 
 
@@ -1678,6 +1746,7 @@ namespace XMLEditor {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm::typeid));
 			this->InputBox = (gcnew System::Windows::Forms::RichTextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
@@ -1698,6 +1767,7 @@ namespace XMLEditor {
 			this->compress = (gcnew System::Windows::Forms::Button());
 			this->decode = (gcnew System::Windows::Forms::Button());
 			this->Decompress = (gcnew System::Windows::Forms::Button());
+			this->DataRepresentation = (gcnew System::Windows::Forms::Button());
 			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -1924,6 +1994,18 @@ namespace XMLEditor {
 			this->Decompress->UseVisualStyleBackColor = true;
 			this->Decompress->Click += gcnew System::EventHandler(this, &MyForm::Decompress_Click);
 			// 
+			// DataRepresentation
+			// 
+			this->DataRepresentation->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->DataRepresentation->Location = System::Drawing::Point(571, 417);
+			this->DataRepresentation->Name = L"DataRepresentation";
+			this->DataRepresentation->Size = System::Drawing::Size(97, 72);
+			this->DataRepresentation->TabIndex = 17;
+			this->DataRepresentation->Text = L"Show Adjacency list";
+			this->DataRepresentation->UseVisualStyleBackColor = true;
+			this->DataRepresentation->Click += gcnew System::EventHandler(this, &MyForm::DataRepresentation_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
@@ -1931,6 +2013,7 @@ namespace XMLEditor {
 			this->AutoScroll = true;
 			this->AutoSize = true;
 			this->ClientSize = System::Drawing::Size(1354, 558);
+			this->Controls->Add(this->DataRepresentation);
 			this->Controls->Add(this->Decompress);
 			this->Controls->Add(this->decode);
 			this->Controls->Add(this->compress);
@@ -1946,6 +2029,9 @@ namespace XMLEditor {
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->InputBox);
 			this->Controls->Add(this->menuStrip1);
+			this->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
 			this->MainMenuStrip = this->menuStrip1;
 			this->MinimumSize = System::Drawing::Size(150, 100);
 			this->Name = L"MyForm";
@@ -2166,63 +2252,95 @@ namespace XMLEditor {
 
 
 	}
-private: System::Void decode_Click(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void decode_Click(System::Object^ sender, System::EventArgs^ e) {
 
-	OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
+		OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
 
-	openFileDialog1->InitialDirectory = "c:\\";
-	openFileDialog1->Filter = "Encoded files (*.txt)|*.txt";
-	openFileDialog1->FilterIndex = 1;
-	openFileDialog1->RestoreDirectory = true;
-	openFileDialog1->Title = "Choose Encoded File Location";
+		openFileDialog1->InitialDirectory = "c:\\";
+		openFileDialog1->Filter = "Encoded files (*.txt)|*.txt";
+		openFileDialog1->FilterIndex = 1;
+		openFileDialog1->RestoreDirectory = true;
+		openFileDialog1->Title = "Choose Encoded File Location";
 
 
-	if (System::Windows::Forms::DialogResult::OK != openFileDialog1->ShowDialog()) return;
-	//string converted_input = msclr::interop::marshal_as< string >(openFileDialog1->FileName);
-	StreamReader^ sr = gcnew StreamReader(openFileDialog1->FileName);
-	InputBox->Text = nullptr;
-	try {
-		for (;;) {
-			String^ line = sr->ReadLine();
-			if (line == nullptr) break;
-			while (line != nullptr) {
-				InputBox->Text += line + "\n";
-				line = sr->ReadLine();
+		if (System::Windows::Forms::DialogResult::OK != openFileDialog1->ShowDialog()) return;
+		//string converted_input = msclr::interop::marshal_as< string >(openFileDialog1->FileName);
+		StreamReader^ sr = gcnew StreamReader(openFileDialog1->FileName);
+		InputBox->Text = nullptr;
+		try {
+			for (;;) {
+				String^ line = sr->ReadLine();
+				if (line == nullptr) break;
+				while (line != nullptr) {
+					InputBox->Text += line + "\n";
+					line = sr->ReadLine();
+				}
 			}
 		}
+		finally {
+			sr->Close();
+		}
+		string converted_input = msclr::interop::marshal_as< string >(InputBox->Text);
+		stringstream output(converted_input);
+		int number;
+		std::vector<int> myNumbers;
+		while (output >> number) {
+			myNumbers.push_back(number);
+		}
+		String^ converted_output = gcnew String(decoding(myNumbers).c_str());
+		//OutputBox->Text = myNumbers[0].ToString();
+		OutputBox->Text = converted_output;
 	}
-	finally {
-		sr->Close();
+	private: System::Void Decompress_Click(System::Object^ sender, System::EventArgs^ e) {
+
+		OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
+
+		openFileDialog1->InitialDirectory = "c:\\";
+		openFileDialog1->Filter = "Compressed files (*.txt)|*.txt";
+		openFileDialog1->FilterIndex = 1;
+		openFileDialog1->RestoreDirectory = true;
+		openFileDialog1->Title = "Choose compressed File";
+
+
+		if (System::Windows::Forms::DialogResult::OK != openFileDialog1->ShowDialog()) return;
+		string converted_input = msclr::interop::marshal_as< string >(openFileDialog1->FileName);
+
+
+		Fcompress FC(converted_input);
+		FC.save_as_xml();
+		FC.decompress();
 	}
-	string converted_input = msclr::interop::marshal_as< string >(InputBox->Text);
-	stringstream output(converted_input);
-	int number;
-	std::vector<int> myNumbers;
-	while (output >> number) {
-		myNumbers.push_back(number);
+	private: System::Void DataRepresentation_Click(System::Object^ sender, System::EventArgs^ e) {
+		string converted_input = msclr::interop::marshal_as< string >(InputBox->Text);
+		string xml = converted_input;
+
+		vector<follow_stuct> follow_stucts = get_users_and_followers(xml);
+		//OutputBox->Text = "123";
+
+		string str = "";
+
+		string* names = id_to_names(xml);
+
+		for (auto f : follow_stucts) {
+			str += names[f.get_my_id()] + " (id:";
+			str += to_string(f.get_my_id());
+			str += ") -------------------> {";
+
+			// for a better printing format
+			for (int i = 0; i < f.get_followers_id().size(); i++) {
+				if (i == f.get_followers_id().size() - 1) {
+					str += names[f.get_followers_id()[i]] + " (id:";
+					str += to_string(f.get_followers_id()[i]) + ")}\n\n";
+				}
+				else {
+					str += names[f.get_followers_id()[i]] + " (id:";
+					str += to_string(f.get_followers_id()[i]) + "),";
+				}
+			}
+		}
+		String^ converted_output = gcnew String(str.c_str());
+		OutputBox->Text = converted_output;
+
 	}
-	String^ converted_output = gcnew String(decoding(myNumbers).c_str());
-	//OutputBox->Text = myNumbers[0].ToString();
-	OutputBox->Text = converted_output;
-}
-private: System::Void Decompress_Click(System::Object^ sender, System::EventArgs^ e) {
-
-	OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
-
-	openFileDialog1->InitialDirectory = "c:\\";
-	openFileDialog1->Filter = "Compressed files (*.txt)|*.txt";
-	openFileDialog1->FilterIndex = 1;
-	openFileDialog1->RestoreDirectory = true;
-	openFileDialog1->Title = "Choose compressed File";
-
-
-	if (System::Windows::Forms::DialogResult::OK != openFileDialog1->ShowDialog()) return;
-	string converted_input = msclr::interop::marshal_as< string >(openFileDialog1->FileName);
-
-
-	Fcompress FC(converted_input);
-	FC.save_as_xml();
-	FC.decompress();
-}
-};
+	};
 };
