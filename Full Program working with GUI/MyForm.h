@@ -18,6 +18,7 @@
 #include <map>
 #include <unordered_map>
 
+
 namespace XMLEditor {
 
 	using namespace System;
@@ -312,7 +313,7 @@ namespace XMLEditor {
 
 
 
-		// fill the elements in the 2 stack(elements, indices) in the stucture
+		// fill the elements in the 2 stack(elements, indices) in the structure
 		while (!stk_index.empty())
 		{
 			my_structure st(stk.top(), stk_index.top());
@@ -1632,22 +1633,19 @@ namespace XMLEditor {
 			vector<string> names_vec = SearchFor(f, "name");
 			string curr_name = SearchFor(f, "name")[0];
 			int curr_id = stoi(SearchFor(f, "id")[0]);
-			//cout << curr_id << " -> " << curr_name << endl; 
 			names[curr_id] = curr_name;
 		}
 
 		return names;
 	}
 
-
-
-	struct follow_stuct {
+	struct follow_struct {
 	private:
 		int my_id;
 		vector<int> followers_id;
 
 	public:
-		follow_stuct(int my_id, vector<int> followers_id) {
+		follow_struct(int my_id, vector<int> followers_id) {
 			this->my_id = my_id;
 			this->followers_id = followers_id;
 		}
@@ -1657,10 +1655,10 @@ namespace XMLEditor {
 		vector<int> get_followers_id() { return this->followers_id; }
 	};
 
-	vector<follow_stuct> get_users_and_followers(string xml) {
+	vector<follow_struct> get_users_and_followers(string xml) {
 
 		vector<string> users_vec = SearchFor(xml, "user");
-		vector<follow_stuct> follow_stucts;
+		vector<follow_struct> follow_structs;
 
 		for (int i = 0; i < users_vec.size(); i++) {
 
@@ -1670,11 +1668,40 @@ namespace XMLEditor {
 
 			for (int j = 1; j < curr_user_id.size(); j++) curr_followers.push_back(stoi(curr_user_id[j]));
 
-			follow_stucts.push_back(follow_stuct(curr_id, curr_followers));
+			follow_structs.push_back(follow_struct(curr_id, curr_followers));
 		}
 
-		return follow_stucts;
+		return follow_structs;
 	}
+
+	void makedotfile(vector<follow_struct> followstructs, string xml) {
+		string* names = id_to_names(xml);
+		ofstream myfile;
+		myfile.open("nodes.dot");
+		myfile << "digraph list {\n node [ shape=\"record\" color = \"blue\"] \n";
+		for (auto f : followstructs) {
+			myfile << to_string(f.get_my_id()) + "[label= \"{" + names[f.get_my_id()] + "|id:" + to_string(f.get_my_id())+ "}\" ]";
+			
+			myfile << "\n";
+		}
+		for (auto f : followstructs) {
+			myfile << to_string(f.get_my_id()) + "-> {";
+
+			// for a better printing format
+			for (int i = 0; i < f.get_followers_id().size(); i++) {
+				if (i == f.get_followers_id().size() - 1) myfile << to_string( f.get_followers_id()[i]) + "}";
+				else myfile << to_string(f.get_followers_id()[i]) + ", ";
+			}
+			myfile << "\n" ;
+		}
+		myfile << "}";
+		myfile.close();
+		system("dot -Tpng -O nodes.dot");
+		system("nodes.dot.png");
+	}
+
+
+
 
 
 
@@ -1726,6 +1753,7 @@ namespace XMLEditor {
 	private: System::Windows::Forms::Button^ decode;
 	private: System::Windows::Forms::Button^ Decompress;
 	private: System::Windows::Forms::Button^ DataRepresentation;
+	private: System::Windows::Forms::Button^ Network_graph;
 
 
 
@@ -1768,6 +1796,7 @@ namespace XMLEditor {
 			this->decode = (gcnew System::Windows::Forms::Button());
 			this->Decompress = (gcnew System::Windows::Forms::Button());
 			this->DataRepresentation = (gcnew System::Windows::Forms::Button());
+			this->Network_graph = (gcnew System::Windows::Forms::Button());
 			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -2006,6 +2035,18 @@ namespace XMLEditor {
 			this->DataRepresentation->UseVisualStyleBackColor = true;
 			this->DataRepresentation->Click += gcnew System::EventHandler(this, &MyForm::DataRepresentation_Click);
 			// 
+			// Network_graph
+			// 
+			this->Network_graph->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->Network_graph->Location = System::Drawing::Point(571, 339);
+			this->Network_graph->Name = L"Network_graph";
+			this->Network_graph->Size = System::Drawing::Size(97, 72);
+			this->Network_graph->TabIndex = 18;
+			this->Network_graph->Text = L"Generate Network Graph";
+			this->Network_graph->UseVisualStyleBackColor = true;
+			this->Network_graph->Click += gcnew System::EventHandler(this, &MyForm::Network_graph_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
@@ -2013,6 +2054,7 @@ namespace XMLEditor {
 			this->AutoScroll = true;
 			this->AutoSize = true;
 			this->ClientSize = System::Drawing::Size(1354, 558);
+			this->Controls->Add(this->Network_graph);
 			this->Controls->Add(this->DataRepresentation);
 			this->Controls->Add(this->Decompress);
 			this->Controls->Add(this->decode);
@@ -2314,14 +2356,13 @@ namespace XMLEditor {
 		string converted_input = msclr::interop::marshal_as< string >(InputBox->Text);
 		string xml = converted_input;
 
-		vector<follow_stuct> follow_stucts = get_users_and_followers(xml);
-		//OutputBox->Text = "123";
+		vector<follow_struct> follow_structs = get_users_and_followers(xml);
 
 		string str = "";
 
 		string* names = id_to_names(xml);
 
-		for (auto f : follow_stucts) {
+		for (auto f : follow_structs) {
 			str += names[f.get_my_id()] + " (id:";
 			str += to_string(f.get_my_id());
 			str += ") -------------------> {";
@@ -2342,5 +2383,15 @@ namespace XMLEditor {
 		OutputBox->Text = converted_output;
 
 	}
-	};
+	private: System::Void Network_graph_Click(System::Object^ sender, System::EventArgs^ e) {
+		string converted_input = msclr::interop::marshal_as< string >(InputBox->Text);
+		string xml = converted_input;
+
+		vector<follow_struct> follow_structs = get_users_and_followers(xml);
+
+		string* names = id_to_names(xml);
+
+		makedotfile(follow_structs, xml);
+	}
+};
 };
